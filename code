@@ -32,10 +32,16 @@ python3 manage.py startapp
 python3 manage.py createsuperuser 
 
 
+
+
+ git remote add AMA_s https://github.com/mohmed022/AMAssistunt_server.git
+ git remote add AM_A_C https://github.com/mohmed022/AMAssistunt_client.git
+
  git init
  git add .
- git commit -m "Initial commit5"
- git push AM_A_C main --force
+ git commit -m "Initial commit"
+ git push AMA_s main --force
+ git push AMA_s main
 
 
 
