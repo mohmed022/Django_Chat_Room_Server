@@ -1,0 +1,175 @@
+python3 manage.py makemigrations 
+python3 manage.py migrate
+python3 manage.py createsuperuser 
+python3 manage.py runserver 7000
+python3 manage.py runserver 
+admin@admin.com
+cd client && npm run dev
+cd server && source env/bin/activate && python3 manage.py runserver
+
+pip install channels
+pip install channels_redis
+
+
+sudo apt install python3-virtualenv
+Python -m venv ./env
+deactivate
+win:
+.\venv\Scripts\activate
+
+linx:
+python3 -m venv env
+source env/bin/activate 
+
+python3 manage.py startapp whiteboardmaster
+python3 manage.py makemigrations
+python3 manage.py migrate
+
+pip install to-requirements.txt
+pip install -r requirements.txt
+python3 manage.py collectstatic
+python3 manage.py startapp
+python3 manage.py createsuperuser 
+
+
+ git init
+ git add .
+ git commit -m "Initial commit5"
+ git push AM_A_C main --force
+
+
+
+
+
+
+admin122
+admin@admin.com
+admin122
+    url(r'^flipbook/', include('flipbook.urls')),
+
+
+
+source env/bin/activate
+npx create-react-app my-app
+
+npm init react-app my-app
+yarn create react-app my-app
+npm init react-app my-app
+
+cd my-app
+npm start
+yarn start
+
+
+npm uninstall -g create-react-app
+yarn global remove create-react-app
+
+
+
+
+ssh root@137.184.183.172
+M&htdWm3rJVf96J
+adduser aml
+usermod -aG sudo aml
+
+ufw app list
+*Available applications:
+  OpenSSH
+============================================================================================================
+ufw allow OpenSSH
+ufw enable
+ufw status
+
+*Output
+Status: active
+
+To                         Action      From
+--                         ------      ----
+OpenSSH                    ALLOW       Anywhere
+OpenSSH (v6)               ALLOW       Anywhere (v6)
+
+سجل الدخول بالادمن وبعدين ثبت
+ssh aml@137.184.183.172
+Aml782000
+
+sudo apt update
+sudo apt install python3-pip python3-dev libpq-dev postgresql postgresql-contrib nginx curl
+*******************************************************************************************************************************************************************************************
+sudo -u postgres psql
+
+الان هننشاء قاعده بينات
+CREATE DATABASE mydatabase;
+CREATE USER mohmeddb WITH PASSWORD 'mohmed0238482506';
+**********************************************************************************************************************************************************************************************
+
+الان هندي اليوزر الصلحيات بالدخول
+ALTER ROLE mohmeddb SET client_encoding TO 'utf8';
+ALTER ROLE mohmeddb SET default_transaction_isolation TO 'read committed';
+ALTER ROLE mohmeddb SET timezone TO 'UTC';
+**********************************************************************************************************************************************************************************************
+
+الآن ، يمكننا منح مستخدمنا الجديد حق الوصول لإدارة قاعدة بياناتنا الجديدة:
+GRANT ALL PRIVILEGES ON DATABASE mohmeddb TO mohmeddb;
+**********************************************************************************************************************************************************************************************
+
+عند الانتهاء ، اخرج من مطالبة PostgreSQL بكتابة:
+\q
+**********************************************************************************************************************************************************************************************
+ لحذف قاعده البانات
+ sudo su postgres
+psql
+doctl databases db delete <database-id> <mydatabase1> [flags]
+
+drop database mydatabase;                                                                            your_database_name
+create database mydatabase1 with owner aml;                                                            user_you_use_in_django
+\q
+exit
+
+
+
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+************************************************************************
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mydatabase',
+        'USER': 'mohmed',
+        'PASSWORD': 'mohmed0238482506',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+
+
+
+sudo ln -s /etc/nginx/sites-available/amshoping/etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+sudo ufw delete allow 8000
+sudo ufw allow 'Nginx Full'
+
+
+
+
+
+
+
+
+
+1+ 1 = 2 
+
+
+
+
+
+Django==3.2.8
+channels==3.0.4
+django-cors-headers==3.8.0
+django-shortuuidfield==0.1.3
+djangorestframework==3.12.4
+djangorestframework-simplejwt==4.8.0
+Pillow==8.3.2
+shortuuid==1.0.1

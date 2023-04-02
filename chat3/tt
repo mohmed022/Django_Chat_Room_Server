@@ -1,0 +1,1381 @@
+# from channels.generic.websocket import AsyncWebsocketConsumer
+# import json
+
+# class ChatConsumer(AsyncWebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         await self.channel_layer.group_add(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         await self.accept()
+
+#     def disconnect(self, close_code):
+#         # Leave room group
+#         await self.channel_layer.group_discard(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#     # Receive message from WebSocket
+#     def receive(self, text_data):
+#         text_data_json = json.loads(text_data)
+#         message = text_data_json['message']
+#         name = text_data_json['name']
+
+#         # Send message to room group
+#         await self.channel_layer.group_send(
+#             self.room_group_name,
+#             {
+#                 'type': 'chat_message',
+#                 'message': message,
+#                 'name': name,
+#             }
+#         )
+
+#     # Receive message from room group
+#     def chat_message(self, event):
+#         message = event['message']
+#         name = event['name']
+
+#         # Send message to WebSocket
+#         await self.send(text_data=json.dumps({
+#             'message': message,
+#             'name': name,
+#         }))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# # chat/consumers.py
+# import json
+# from asgiref.sync import async_to_sync
+# from channels.generic.websocket import WebsocketConsumer
+# from chat.models import Room, Chat
+
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs'].get('room_name', None)
+
+#         if self.room_name is None:
+#             # If room name is not provided, create a new room
+#             room = Room.objects.create()
+#             self.room_name = str(room.id)
+
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         self.accept()
+
+#     def disconnect(self, close_code):
+#         # Leave room group
+#         async_to_sync(self.channel_layer.group_discard)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#     def chat_message(self, event):
+#         message = event['message']
+#         name = event['name']
+
+#         # Send message to WebSocket
+#         self.send(text_data=json.dumps({
+#             'message': message,
+#             'name': name
+#         }))
+
+#     def receive(self, text_data):
+#         text_data_json = json.loads(text_data)
+#         message = text_data_json['message']
+#         name = text_data_json['name']
+#         user = self.scope['user']
+#         room = Room.objects.get_or_create(name=self.room_name)[0]
+
+#         # Create a new Chat instance and save it to the database
+#         chat = Chat.objects.create(room=room, user=user, message=message)
+#         chat.save()
+
+#         # Send message to room group
+#         async_to_sync(self.channel_layer.group_send)(
+#             self.room_group_name,
+#             {
+#                 'type': 'chat_message',
+#                 'message': message,
+#                 'name': name
+#             }
+#         )
+
+
+
+
+
+
+
+
+
+# # chat/consumers.py
+# import json
+# from asgiref.sync import async_to_sync
+# from channels.generic.websocket import WebsocketConsumer
+# from chat.models import Room , Chat
+
+# from channels.auth import AuthMiddlewareStack
+# from channels.db import database_sync_to_async
+# from django.contrib.auth.models import User
+
+
+
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         self.accept()
+
+        
+#     def disconnect(self, close_code):
+#         # Leave room group
+#         async_to_sync(self.channel_layer.group_discard)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#     # Receive message from WebSocket
+#     def receive(self, text_data):
+        
+#         print(text_data)
+#         text_data_json = json.loads(text_data)
+#         message = text_data_json['message']
+#         room = text_data_json['room']
+#         user = text_data_json['user']
+#         image = text_data_json['image']
+
+
+#         # Send message to room group
+#         async_to_sync(self.channel_layer.group_send)(
+#             self.room_group_name,
+#             {
+#                 'type': 'chat_message',
+#                 'message':message,
+#                 'room':room,
+#                 'user':user,
+#                 'image':image
+#             }
+#         )
+        
+
+
+#     # Receive message  mohmedfrom room group
+#     def chat_message(self, event):
+#         message = event['message']
+#         room = event['room']
+#         user = event['user']
+#         image = event['image']
+
+
+#         # Send message to WebSocket
+#         self.send(text_data=json.dumps({
+#             'message':message,
+#             'room':room,
+#             'user':user,
+#             "image":image
+#         }))
+
+
+
+
+
+
+
+    # def receive(self, text_data):
+    #     text_data_json = json.loads(text_data)
+    #     message = text_data_json['message']
+    #     name = text_data_json['name']
+    #     user = text_data_json['user']
+    #     print(name, user , message)
+    #     room = Room.objects.get_or_create(name=self.room_name)[0]
+
+    #     # Create a new Chat instance and save it to the database
+    #     chat = Chat.objects.create(room=room, user=user, message=message)
+    #     chat.save()
+
+    #     # Send message to room group
+    #     async_to_sync(self.channel_layer.group_send)(
+    #         self.room_group_name,
+    #         {
+    #             'type': 'chat_message',
+    #             'message': message,
+    #             'name': name
+    #         }
+    #     )
+
+
+
+
+
+
+
+# ***************************************************************************************************************************************************
+
+# # chat/consumers.py
+# from django.core.files.uploadedfile import InMemoryUploadedFile
+# import io
+# import json
+# from asgiref.sync import async_to_sync
+# from channels.generic.websocket import WebsocketConsumer
+# from chat3.models import Room , Chat
+# from users.models import NewUser
+# import base64
+
+
+
+
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         self.accept()
+
+        
+#     def disconnect(self, close_code):
+#         # Leave room group
+#         async_to_sync(self.channel_layer.group_discard)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#     # Receive message from WebSocket
+#     def receive(self, text_data):
+#         user = self.scope['user']
+#         text_data_json = json.loads(text_data)
+#         user_id = text_data_json['user']
+#         print(user_id , user)
+        
+#         message = text_data_json['message']
+#         room = text_data_json['room']
+#         room = Room.objects.get(name=room)
+#         user_id = NewUser.objects.get(id=user_id)
+#         print(room , user_id)
+
+#         image_data = text_data_json.get('image') # Check if an image is included in the message
+#         image = None
+    
+#         # Save the image to the server
+#         if image_data:
+#             image_file = io.BytesIO(base64.b64decode(image_data))
+#             image = InMemoryUploadedFile(image_file, None, 'image.png', 'image/png', image_file.tell(), None)
+#             image.seek(0)
+
+        
+#         # Create a new chat message
+#         chat = Chat.objects.create(room_id=room, message=message, image=image)
+#         # chat.user_id = user_id
+#         chat.user_id.set([user_id])
+    
+#         # Send message to room group
+#         async_to_sync(self.channel_layer.group_send)(
+#             self.room_group_name,
+#             {
+#                 'type': 'chat_message',
+#                 'message': chat.message,
+#                 'room': chat.room_id,
+#                 'user': chat.user_id,
+#                 'image': chat.image.url if chat.image else None,
+#                 'created_at': chat.created_at.isoformat(), # Send the timestamp in ISO format
+#             }
+#         )
+        
+#     def chat_message(self, event):
+#         message = event['message']
+#         room = event['room']
+#         user = event['user']
+#         image = event['image']
+#         created_at = event['created_at']
+#         print(message , room , user , image , created_at , 1)
+
+#         # Build the message data
+#         message_data = {
+#             'message': message,
+#             'room': room,
+#             'user': user,
+#             'created_at': created_at,
+#         }
+        
+#         print(message , room , user , image , created_at , 2)
+    
+#         # Add the image URL to the message data if an image was included in the chat message
+#         if image:
+#             message_data['image'] = image
+        
+#         print(message , room , user , image , created_at , 3)
+
+#         # Send message to WebSocket
+#         self.send(text_data=json.dumps(message_data))
+#         print(message , room , user , image , created_at , 4)
+
+
+    
+
+    
+# # chat/consumers.py
+# from django.core.files.uploadedfile import InMemoryUploadedFile
+# from django.core.serializers.json import DjangoJSONEncoder
+
+# import io
+# import json
+# from asgiref.sync import async_to_sync
+# from channels.generic.websocket import WebsocketConsumer
+# from chat3.models import Room, Chat
+# from users.models import NewUser
+# import base64
+# from datetime import datetime
+# from channels.generic.websocket import AsyncWebsocketConsumer
+# from django.conf import settings
+
+
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         self.accept()
+
+#     def disconnect(self, close_code):
+#         # Leave room group
+#         async_to_sync(self.channel_layer.group_discard)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+#     def receive(self, text_data):
+#         try:
+#             user = self.scope['user']
+#             text_data_json = json.loads(text_data)
+#             user_id = text_data_json.get('user', None)
+#             message = text_data_json.get('message', '')
+#             room = text_data_json.get('room', '')
+    
+#             try:
+#                 room = Room.objects.get(name=room)
+#             except Room.DoesNotExist:
+#                 raise ValueError("Room does not exist")
+    
+#             user_id = NewUser.objects.get(id=user_id)
+#             image_data = text_data_json.get('image')
+#             image = None  # Set the image variable to None by default
+#             if image_data:
+#                 image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+    
+#             # Create a new chat message
+#             chat = Chat.objects.create(room_id=room, message=message, image=image)
+#             chat.user_id.set([user_id])
+#             print(chat)
+    
+#             # Send message to room group
+#             async_to_sync(self.channel_layer.group_send)(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'chat_message',
+#                     'message': chat.message,
+#                     'room': chat.room_id,
+#                     'user': chat.user_id,
+#                     'image': chat.image.url if chat.image else None,  # Include the URL of the image if it is present
+#                     'created_at': chat.created_at.isoformat(),  # Send the timestamp in ISO format
+#                 }
+#             )
+#             print(message , chat.user_id , 1111111111)
+    
+#         except Exception as e:
+#             # Handle the exception here
+#             print(f"An error occurred: {e}")
+#             self.send(text_data=json.dumps({'error': str(e)}))
+    
+    # Receive message from WebSocket
+    # def receive(self, text_data):
+    #     try:
+    #         user = self.scope['user']
+    #         text_data_json = json.loads(text_data)
+    #         user_id = text_data_json.get('user', None)
+    #         message = text_data_json.get('message', '')
+    #         room = text_data_json.get('room', '')
+
+    #         try:
+    #             room = Room.objects.get(name=room)
+    #         except Room.DoesNotExist:
+    #             raise ValueError("Room does not exist")
+
+    #         user_id = NewUser.objects.get(id=user_id)
+    #         image_data = text_data_json.get('image')
+    #         if image_data:
+    #             image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+
+    #         # Create a new chat message
+    #         chat = Chat.objects.create(room_id=room, message=message, image=image)
+    #         chat.user_id.set([user_id])
+    #         print(chat)
+
+    #         # Send message to room group
+    #         async_to_sync(self.channel_layer.group_send)(
+    #             self.room_group_name,
+    #             {
+    #                 'type': 'chat_message',
+    #                 'message': chat.message,
+    #                 'room': chat.room_id,
+    #                 'user': chat.user_id,
+    #                 'image': chat.image.url if chat.image else None,  # Include the URL of the image if it is present
+    #                 'created_at': chat.created_at.isoformat(),  # Send the timestamp in ISO format
+    #             }
+    #         )
+    #         print(message , chat.user_id , 1111111111)
+
+    #     except Exception as e:
+    #         # Handle the exception here
+    #         print(f"An error occurred: {e}")
+    #         self.send(text_data=json.dumps({'error': str(e)}))
+
+                
+                
+    # def chat_message(self, event):
+    #     message = event['message']
+    #     users = event['user'].all()
+    #     user_ids = [user.id for user in users]
+    #     user_names = [user.user_name for user in users]
+    #     user_images = [user.image.url for user in users]
+    #     image = event['image']
+    #     # Add scheme to user image URLs if missing
+    #     for i in range(len(user_images)):
+    #         if not user_images[i].startswith('http'):
+    #             user_images[i] = f"{settings.SITE_URL}{user_images[i]}"
+    
+    #     room_id = event['room']
+    #     room = Room.objects.get(id=room_id.id)
+    
+    #     message_data = {
+    #         'message': message,
+    #         'timestamp': datetime.now().strftime("%m/%d/%Y %I:%M %p"),
+    #         'room_name': room.name,
+    #         'user_id': list(user_ids),
+    #         'user_name': list(user_names),
+    #         'user_image': list(user_images),
+    #         'image': image,
+    #     }
+    
+    #     # Serialize message_data to JSON using DjangoJSONEncoder
+    #     json_message = json.dumps(message_data, cls=DjangoJSONEncoder)
+    #     self.send(text_data=json_message)
+    #     print(message_data)
+    
+        
+        
+        
+        
+# import json
+# import base64
+# from channels.generic.websocket import AsyncWebsocketConsumer
+# from chat3.models import Room, Chat
+# from users.models import NewUser
+# from django.core.files.uploadedfile import InMemoryUploadedFile
+# import io
+
+# class ChatConsumer(AsyncWebsocketConsumer):
+#     async def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         await self.channel_layer.group_add(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         await self.accept()
+
+#     async def disconnect(self, close_code):
+#         # Leave room group
+#         await self.channel_layer.group_discard(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#     # Receive message from WebSocket
+#     async def receive(self, text_data):
+#         text_data_json = json.loads(text_data)
+#         user_id = text_data_json.get('user')
+#         message = text_data_json.get('message')
+#         room = text_data_json.get('room')
+
+#         try:
+#             room = Room.objects.get(name=room)
+#         except Room.DoesNotExist:
+#             raise ValueError("Room does not exist")
+
+#         user = await self.get_user(user_id)
+#         image_data = text_data_json.get('image')
+#         if image_data:
+#             image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+#         else:
+#             image = None
+
+#         # Create a new chat message
+#         chat = Chat.objects.create(room=room, message=message, image=image)
+#         chat.user.add(user)
+
+#         # Send message to room group
+#         await self.channel_layer.group_send(
+#             self.room_group_name,
+#             {
+#                 'type': 'chat_message',
+#                 'message': chat.message,
+#                 'room': chat.room.name,
+#                 'user': user.username,
+#                 'image': chat.image.url if chat.image else None,  # Include the URL of the image if it is present
+#                 'created_at': chat.created_at.isoformat(),  # Send the timestamp in ISO format
+#             }
+#         )
+
+#     async def chat_message(self, event):
+#         # Send message to WebSocket
+#         await self.send(text_data=json.dumps(event))
+
+#     async def get_user(self, user_id):
+#         return await NewUser.objects.get(id=user_id)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.serializers.json import DjangoJSONEncoder
+
+import io
+import json
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer
+from chat3.models import Room, Chat
+from users.models import NewUser
+import base64
+from datetime import datetime
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.conf import settings
+
+
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         # Fetch old messages from the database
+#         old_messages = Chat.objects.filter(room_id__name=self.room_name).order_by('id')
+
+#         # Send old messages to the client
+#         for message in old_messages:
+#             async_to_sync(self.channel_layer.group_send)(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'chat_message',
+#                     'id': message.id,
+#                     'message': message.message,
+#                     'room': message.room_id,
+#                     'user': message.user_id,
+#                     'image': message.image.url if message.image else None,
+#                     'created_at': message.created_at.isoformat(),
+#                 }
+#             )
+
+#         self.accept()
+
+    # def disconnect(self, close_code):
+    #     # Leave room group
+    #     async_to_sync(self.channel_layer.group_discard)(
+    #         self.room_group_name,
+    #         self.channel_name
+    #     )
+
+#     # Receive message from WebSocket
+    # def receive(self, text_data):
+    #     print(text_data)
+    #     try:
+    #         user = self.scope['user']
+    #         text_data_json = json.loads(text_data)
+    #         user_id = text_data_json.get('user', None)
+    #         message = text_data_json.get('message', '')
+    #         room = text_data_json.get('room', '')
+
+    #         try:
+    #             room = Room.objects.get(name=room)
+    #         except Room.DoesNotExist:
+    #             raise ValueError("Room does not exist")
+
+    #         user_id = NewUser.objects.get(id=user_id)
+    #         image_data = text_data_json.get('image')
+    #         if image_data:
+    #             image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+    #         else:
+    #             image = None
+
+    #         # Create a new chat message
+    #         chat = Chat.objects.create(room_id=room, message=message, image=image)
+    #         chat.user_id.set([user_id])
+
+    #         # Send message to room group
+    #         async_to_sync(self.channel_layer.group_send)(
+    #             self.room_group_name,
+    #             {
+    #                 'type': 'chat_message',
+    #                 'message': chat.message,
+    #                 'room': chat.room_id,
+    #                 'user': chat.user_id,
+    #                 'image': chat.image.url if chat.image else None,  # Include the URL of the image if it is present
+    #                 'created_at': chat.created_at.isoformat(),  # Send the timestamp in ISO format
+    #             }
+    #         )
+
+    #     except (ValueError, NewUser.DoesNotExist, Room.DoesNotExist) as e:
+    #         # Handle the exception here
+    #         print(f"An error occurred: {e}")
+    #         self.send(text_data=json.dumps({'error': str(e)}))
+    #         return
+
+    #     except Exception as e:
+    #         # Handle the exception here
+    #         print(f"An error occurred: {e}")
+    #         self.send(text_data=json.dumps({'error': "Something went wrong"}))
+    #         return
+
+#     def chat_message(self, event):
+#         try:
+#             message = event['message']
+#             id = event['id']
+#             users = event['user'].all()
+#             user_ids = [user.id for user in users]
+#             user_names = [user.user_name for user in users]
+#             user_images = [user.image.url for user in users]
+#             image = event['image']
+
+#             # Add scheme to user image URLs if missing
+#             for i in range(len(user_images)):
+#                 if not user_images[i].startswith('http'):
+#                     user_images[i] = f"{settings.SITE_URL}{user_images[i]}"
+
+#             room_id = event['room']
+#             room = Room.objects.get(id=room_id.id)
+#             message_data = {
+#                 'id':id,
+#                 'message': message,
+#                 'timestamp': datetime.now().strftime("%m/%d/%Y %I:%M %p"),
+#                 'room_name': room.name,
+#                 'user_id': list(user_ids),
+#                 'user_name': list(user_names),
+#                 'user_image': list(user_images),
+#                 'image': image,
+#             }
+
+#             # Add full path to image if present
+#             if image and not image.startswith('http'):
+#                 image = f"{settings.SITE_URL}{image}"
+#                 message_data['image'] = image
+    
+#             # Serialize message_data to JSON using DjangoJSONEncoder
+#             json_message = json.dumps(message_data, cls=DjangoJSONEncoder)
+#             self.send(text_data=json_message)
+#             # json_message = json_message.filter(room_id__name=self.room_name).order_by('id')
+#             print(message_data)
+
+#         except Exception as e:
+#             # Handle the exception here
+#             print(f"An error occurred: {e}")
+#             self.send(text_data=json.dumps({'error': str(e)}))
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+
+            
+            
+  
+            
+            
+            
+            
+            
+            
+# from django.core.files.uploadedfile import InMemoryUploadedFile
+# from django.core.serializers.json import DjangoJSONEncoder
+# from django.conf import settings
+
+# import io
+# import json
+# import base64
+# from datetime import datetime
+
+# from asgiref.sync import async_to_sync
+# from channels.generic.websocket import WebsocketConsumer
+# from channels.db import database_sync_to_async
+
+# from chat3.models import Room, Chat
+# from users.models import NewUser
+
+# from rest_framework_simplejwt.tokens import RefreshToken
+
+
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         # Fetch old messages from the database
+#         old_messages = Chat.objects.filter(room_id__name=self.room_name).order_by('id')
+
+#         # Send old messages to the client
+#         for message in old_messages:
+#             async_to_sync(self.channel_layer.group_send)(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'chat_message',
+#                     'message': message.message,
+#                     'room': message.room_id,
+#                     'user': message.user_id,
+#                     'image': message.image.url if message.image else None,
+#                     'created_at': message.created_at.isoformat(),
+#                 }
+#             )
+
+#         self.accept()
+
+#     def disconnect(self, close_code):
+#         # Leave room group
+#         async_to_sync(self.channel_layer.group_discard)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#     def receive(self, text_data):
+#         try:
+#             user = self.scope['user']
+#             text_data_json = json.loads(text_data)
+#             user_id = text_data_json.get('user', None)
+#             message = text_data_json.get('message', '')
+#             room = text_data_json.get('room', '')
+    
+#             try:
+#                 room = Room.objects.get(name=room)
+#             except Room.DoesNotExist:
+#                 raise ValueError("Room does not exist")
+    
+#             user_id = NewUser.objects.get(id=user_id)
+#             image_data = text_data_json.get('image')
+#             if image_data:
+#                 image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+#             else:
+#                 image = None
+    
+#             # Create a new chat message
+#             chat = Chat.objects.create(room_id=room, message=message, image=image)
+#             chat.user_id.set([user_id])
+    
+#             # Send message to room group
+#             async_to_sync(self.channel_layer.group_send)(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'chat_message',
+#                     'message': chat.message,
+#                     'room': chat.room_id,
+#                     'user': chat.user_id,
+#                     'image': chat.image.url if chat.image else None,  # Include the URL of the image if it is present
+#                     'created_at': chat.created_at.isoformat(),  # Send the timestamp in ISO format
+#                 }
+#             )
+    
+#         except (ValueError, NewUser.DoesNotExist, Room.DoesNotExist) as e:
+#             # Handle the exception here
+#             error_message = {'error': str(e)}
+#             self.send(text_data=json.dumps(error_message))
+#     def chat_message(self, event):
+#         message = event['message']
+#         room = event['room']
+#         user = event['user']
+#         image = event['image']
+#         created_at = event['created_at']
+        
+#         # Send message to WebSocket
+#         self.send(text_data=json.dumps({
+#             'message': message,
+#             'room': room.name,
+#             'user': user.username,
+#             'image': image,
+#             'created_at': created_at
+#         }))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         # Initialize list to keep track of sent messages
+#         self.sent_messages = []
+
+#         # Fetch old messages from the database
+#         old_messages = Chat.objects.filter(room_id__name=self.room_name).order_by('id')
+
+#         # Send old messages to the client
+#         for message in old_messages:
+#             # Check if message has already been sent
+#             if message.id not in self.sent_messages:
+#                 async_to_sync(self.channel_layer.group_send)(
+#                     self.room_group_name,
+#                     {
+#                         'type': 'chat_message',
+#                         'id': message.id,
+#                         'message': message.message,
+#                         'room': message.room_id,
+#                         'user': message.user_id,
+#                         'image': message.image.url if message.image else None,
+#                         'created_at': message.created_at.isoformat(),
+#                     }
+#                 )
+#                 # Add sent message ID to list
+#                 self.sent_messages.append(message.id)
+
+#         self.accept()
+    
+    
+#     def disconnect(self, close_code):
+#         # Leave room group
+#         async_to_sync(self.channel_layer.group_discard)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+        
+        
+#     def receive(self, text_data):
+#         # print(text_data )
+#         try:
+#             user = self.scope['user']
+#             text_data_json = json.loads(text_data)
+#             user_id = text_data_json.get('user', None)
+#             message = text_data_json.get('message', '')
+#             room = text_data_json.get('room', '')
+
+#             try:
+#                 room = Room.objects.get(name=room)
+#             except Room.DoesNotExist:
+#                 raise ValueError("Room does not exist")
+
+#             user_id = NewUser.objects.get(id=user_id)
+#             image_data = text_data_json.get('image')
+#             if image_data:
+#                 image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+#             else:
+#                 image = None
+
+#             # Create a new chat message
+#             chat = Chat.objects.create(room_id=room, message=message, image=image)
+#             chat.user_id.set([user_id])
+
+#             # Send message to room group
+#             async_to_sync(self.channel_layer.group_send)(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'chat_message',
+#                     'message': chat.message,
+#                     'room': chat.room_id,
+#                     'user': chat.user_id,
+#                     'image': chat.image.url if chat.image else None,  # Include the URL of the image if it is present
+#                     'created_at': chat.created_at.isoformat(),  # Send the timestamp in ISO format
+#                 }
+#             )
+
+#         except (ValueError, NewUser.DoesNotExist, Room.DoesNotExist) as e:
+#             # Handle the exception here
+#             print(f"An error occurred: {e}")
+#             self.send(text_data=json.dumps({'error': str(e)}))
+#             return
+
+#         except Exception as e:
+#             # Handle the exception here
+#             print(f"An error occurred: {e}")
+#             self.send(text_data=json.dumps({'error': "Something went wrong"}))
+#             return
+        
+        
+    # def chat_message(self, event):
+    #    try:
+    #        if 'id' not in event:
+    #            raise ValueError("'id' key is not present in event")
+               
+    #        message_id = event['id']
+    #        # Check if message has already been sent
+    #        if message_id not in self.sent_messages:
+    #            id = event['id']
+    #            message = event['message']
+    #            users = event['user'].all()
+    #            user_ids = [user.id for user in users]
+    #            user_names = [user.user_name for user in users]
+    #            user_images = [user.image.url for user in users]
+    #            image = event['image']
+    #            print(self.sent_messages)
+
+    #            # Add scheme to user image URLs if missing
+    #            for i in range(len(user_images)):
+    #                if not user_images[i].startswith('http'):
+    #                    user_images[i] = f"{settings.SITE_URL}{user_images[i]}"
+
+    #            room_id = event['room']
+    #            room = Room.objects.get(id=room_id.id)
+    #            message_data = {
+    #                'id': id,
+    #                'message': message,
+    #                'timestamp': datetime.now().strftime("%m/%d/%Y %I:%M %p"),
+    #                'room_name': room.name,
+    #                'user_id': list(user_ids),
+    #                'user_name': list(user_names),
+    #                'user_image': list(user_images),
+    #                'image': image,
+    #            }
+
+            #    # Add full path to image if present
+            #    if image and not image.startswith('http'):
+            #        image = f"{settings.SITE_URL}{image}"
+            #        message_data['image'] = image
+
+    #            # Serialize message_data to JSON using DjangoJSONEncoder
+    #            json_message = json.dumps(message_data, cls=DjangoJSONEncoder)
+    #            self.send(text_data=json_message)
+    #            # Add sent message ID to list
+    #            self.sent_messages.append(message_id)
+    #            print( message_id , "4444444444444444444444444444444444444444444444444444444")
+
+    #    except KeyError as e:
+    #        # Handle the KeyError exception
+    #        print(f"KeyError occurred: {e}")
+    #        self.send(text_data=json.dumps({'error': 'Required key missing in the event data.'}))
+    #    except Room.DoesNotExist as e:
+    #        # Handle the DoesNotExist exception
+    #        print(f"Room.DoesNotExist occurred: {e}")
+    #        self.send(text_data=json.dumps({'error': 'Room does not exist.'}))
+    #    except Exception as e:
+    #        # Handle any other exception
+    #        print(f"An error occurred: {e}")
+    #        self.send(text_data=json.dumps({'error': str(e)}))
+
+
+
+
+
+
+
+
+
+
+
+
+
+from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.serializers.json import DjangoJSONEncoder
+from django.conf import settings
+import json
+import io
+import base64
+from datetime import datetime
+from .models import Chat, Room
+import uuid
+
+
+class ChatConsumer(WebsocketConsumer):
+
+    def connect(self):
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = 'chat_%s' % self.room_name
+
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        # Initialize list to keep track of sent messages
+        self.sent_messages = []
+
+        # Fetch old messages from the database
+        old_messages = Chat.objects.filter(room_id__name=self.room_name).order_by('id')
+
+        # Send old messages to the client
+        for message in old_messages:
+            # Check if message has already been sent
+            if message.id not in self.sent_messages:
+                async_to_sync(self.channel_layer.group_send)(
+                    self.room_group_name,
+                    {
+                        'type': 'chat_message',
+                        'id': message.id,
+                        'message': message.message,
+                        'room': message.room_id.id,
+                        'user': message.user_id,
+                        'user_id': [user.id for user in message.user_id.all()],
+                        'user_name': [user.user_name for user in message.user_id.all()],
+                        'image': message.image.url if message.image else None,
+                        'user_image':[user.image for user in message.user_id.all()],
+                        'created_at': message.created_at.isoformat(),
+                    }
+                )
+                # Add sent message ID to list
+                self.sent_messages.append(message.id)
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    def receive(self, text_data):
+        # print(text_data)
+        try:
+            user = self.scope['user']
+            text_data_json = json.loads(text_data)
+            user_id = text_data_json.get('user_id', None)
+            user_name = text_data_json.get('user_name', None)
+            message = text_data_json.get('message', '')
+            room = text_data_json.get('room', '')
+            user_image = text_data_json.get('user_image', '')
+
+            try:
+                room = Room.objects.get(name=room)
+            except Room.DoesNotExist:
+                raise ValueError("Room does not exist")
+
+            user_id = NewUser.objects.get(id=user_id)
+            print(user_id.user_name , "user_id")
+            image_data = text_data_json.get('image')
+            if image_data:
+                image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+            else:
+                image = None
+
+            # Create a new chat message
+            chat = Chat.objects.create(room_id=room, message=message, image=image)
+            chat.user_id.add(user_id)
+
+            # Send message to room group
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'id':chat.id,
+                    'user': chat.user_id.id,
+                    'message': chat.message,
+                    'room': chat.room_id.id,
+                    'image': chat.image.url if chat.image else None,
+                    'created_at': chat.created_at.isoformat(),
+                    'user_id': user_id.id,
+                    'user_name': user_id.user_name,
+                    'user_image': user_id.image.url if user_id.image else None,
+                }
+            )
+
+            
+
+        except (ValueError, NewUser.DoesNotExist, Room.DoesNotExist) as e:
+            # Handle the exception here
+            print(f"An error occurred: {e}")
+            self.send(text_data=json.dumps({'error': str(e)}))
+            return
+
+        except Exception as e:
+            # Handle the exception here
+            print(f"An error occurred: {e}")
+            self.send(text_data=json.dumps({'error': "Something went wrong"}))
+
+
+    def chat_message(self, event):
+        # print(event)
+        try:
+            if 'id' not in event:
+                raise ValueError("'id' key is not present in event")
+            if 'user_id' not in event:
+                raise ValueError("'user_id' key is not present in event")
+
+            message_id = event['id']
+            message = event['message']
+            room_id = event['room']
+            image_url = event['image']
+            created_at = event['created_at']
+            
+            user_id = event.get('user_id')
+            print(user_id)
+            user_name = event['user_name']
+            user_image = event['user_image']
+            user_image_urls = [img.url for img in user_image] if user_image else None
+            image_urls = [img.url for img in user_image] if user_image else None
+
+            # Send message to WebSocket
+            self.send(text_data=json.dumps({
+                'id': message_id,
+                'message': message,
+                'room': room_id,
+                'image': image_urls,
+                'user_image': user_image_urls,
+                'user_id': user_id,
+                'user_name':user_name,
+                'created_at': created_at,
+            }, cls=DjangoJSONEncoder))
+            # print(self.sent_messages)
+        except KeyError as e:
+            # Handle the KeyError exception
+            print(f"KeyError occurred: {e}")
+            self.send(text_data=json.dumps({'error': 'Required key missing in the event data.'}))
+        except Chat.DoesNotExist as e:
+            # Handle the DoesNotExist exception
+            print(f"Chat.DoesNotExist occurred: {e}")
+            self.send(text_data=json.dumps({'error': 'Chat message does not exist.'}))
+        except Exception as e:
+            # Handle any other exception
+            print(f"An error occurred: {e}")
+            self.send(text_data=json.dumps({'error': str(e)}))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class ChatConsumer(WebsocketConsumer):
+#     def connect(self):
+#         self.room_name = self.scope['url_route']['kwargs']['room_name']
+#         self.room_group_name = 'chat_%s' % self.room_name
+
+#         # Join room group
+#         async_to_sync(self.channel_layer.group_add)(
+#             self.room_group_name,
+#             self.channel_name
+#         )
+
+#         # Fetch the last sent message ID from the client
+#         last_message_id = self.scope['query_string'].decode('utf-8')
+#         if last_message_id:
+#             self.last_message_id = int(last_message_id)
+#         else:
+#             self.last_message_id = 0
+
+#         # Fetch old messages from the database
+#         old_messages = Chat.objects.filter(room_id__name=self.room_name, id__gt=self.last_message_id).order_by('id')
+
+#         # Send old messages to the client
+#         for message in old_messages:
+#             async_to_sync(self.channel_layer.group_send)(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'chat_message',
+#                     'id': message.id,
+#                     'message': message.message,
+#                     'room': message.room_id.id,
+#                     'user': [user.id for user in message.user_id.all()],
+#                     'image': message.image.url if message.image else None,
+#                     'created_at': message.created_at.isoformat(),
+#                 }
+#             )
+
+#         # Set the last sent message ID to the highest ID among the old messages
+#         if old_messages.exists():
+#             self.last_message_id = old_messages.last().id
+
+#         # Accept the WebSocket connection
+#         self.accept()
+
+#     def receive(self, text_data):
+#         try:
+#             user = self.scope['user']
+#             text_data_json = json.loads(text_data)
+#             user_id = text_data_json.get('user', None)
+#             message = text_data_json.get('message', '')
+#             room = text_data_json.get('room', '')
+
+#             try:
+#                 room = Room.objects.get(name=room)
+#             except Room.DoesNotExist:
+#                 raise ValueError("Room does not exist")
+
+#             user_id = NewUser.objects.get(id=user_id)
+#             image_data = text_data_json.get('image')
+#             if image_data:
+#                 image = InMemoryUploadedFile(io.BytesIO(base64.b64decode(image_data)), None, 'image.png', 'image/png', None, None)
+#             else:
+#                 image = None
+
+#             # Create a new chat message
+#             chat = Chat.objects.create(room_id=room, message=message, image=image)
+#             chat.user_id.add(user_id)
+
+#             # Send message to room group
+#             async_to_sync(self.channel_layer.group_send)(
+#                 self.room_group_name,
+#                 {
+#                     'type': 'chat_message',
+#                     'id':chat.id,
+#                     'message': chat.message,
+#                     'room': chat.room_id.id,
+#                     'user': user_id.id,
+#                     'image': chat.image.url if chat.image else None,
+#                     'created_at': chat.created_at.isoformat(),
+#                 }
+#             )
+
+#         except (ValueError, NewUser.DoesNotExist, Room.DoesNotExist) as e:
+#             # Handle the exception here
+#             print(f"An error occurred: {e}")
+#             self.send(text_data=json.dumps({'error': str(e)}))
+#             return
+
+#         except Exception as e:
+#             # Handle the exception here
+#             print(f"An error occurred: {e}")
+#             self.send(text_data=json.dumps({'error': "Something went wrong"}))
+
+#     def chat_message(self, event):
+#         try:
+#             message_id = event['id']
+#             message = event['message']
+#             room = event['room']
+#             user = event['user']
+#             image = event['image']
+#             created_at = event['created_at']
+            
+#             # Send the message to the WebSocket
+#             if message_id > self.last_message_id:
+#                 self.send(text_data=json.dumps({
+#                     'id': message_id,
+#                     'message': message,
+#                     'room': room,
+#                     'user': user,
+#                     'image': image,
+#                     'created_at': created_at
+#                 }))
+
+#         except ValueError as e:
+#             # Handle the exception here
+#             print(f"An error occurred: {e}")
+#             self.send(text_data=json.dumps({'error': str(e)}))
+#             return
+#         except Exception as e:
+#             # Handle the exception here
+#             print(f"An error occurred in chat_message: {e}")
+#             self.send(text_data=json.dumps({'error': "Something went wrong"}))
+    
+

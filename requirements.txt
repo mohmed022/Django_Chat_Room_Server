@@ -1,0 +1,34 @@
+pip install asgiref==3.2.10
+pip install certifi==2020.6.20
+pip install chardet==3.0.4
+pip install coreapi==2.3.3
+pip install coreschema==0.0.4
+
+
+
+pip install idna==2.10
+pip install itypes==1.2.0
+pip install Jinja2==2.11.2
+pip install MarkupSafe==1.1.1
+pip install Pillow==7.2.0
+pip install requests==2.24.0
+pip install sqlparse==0.3.1
+pip install uritemplate==3.0.1
+pip install urllib3==1.25.10
+
+
+pip install django-ckeditor
+pip install Django==3.2
+pip install django-cors-headers==3.5.0
+pip install djangorestframework==3.11.1
+pip install djangorestframework-simplejwt==4.4.0
+pip install --upgrade djangorestframework-simplejwt
+python -m pip install Pillow
+pip install PyJWT==1.7.1
+pip install pytz==2020.1
+
+pip install channels_redis
+
+
+"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MiwiZXhwIjoxNjc1ODA3NzIyLCJpYXQiOjE2NzU4MDQxMjJ9.wu8s4Sb6dnoFEHDZKkxRKuDs0KsmwftUH_wsJfM1mH4"
+"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MiwiZXhwIjoxNjc1ODA5MDQzLCJpYXQiOjE2NzU4MDU0NDN9.273EL4_FLnqDcU3tc0OHN_mCVnAZnhLIFiSKBOi9N2w"
