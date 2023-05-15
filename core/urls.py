@@ -28,15 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # User Management
     path('api/user/', include('users.urls', namespace='users')),
-    path('api/', include('university.urls')),
-    path('', include('chat.urls')),
-    path('api/', include('chat2.urls')),
-    path('api2/', include('chat3.urls')),
-    # path('api-auth/', include('rest_framework.urls')),
-
-    
-    
-
+    path('api/chat3/', include('chat3.urls', namespace='chat3')),
 
 ]
 

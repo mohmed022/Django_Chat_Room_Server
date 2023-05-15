@@ -8,10 +8,11 @@ from django.conf import settings
 from channels.layers import get_channel_layer
 from django.core.serializers.json import DjangoJSONEncoder
 from django.conf import settings
-from .models import Chat, Room , Notification
+from .models import Chat, Room , vote , Voting_Questions , Notification
 from urllib.parse import parse_qs
 import jwt
 import re   # للتعرف علي ارقام الهواتق والروابط واخفائها
+from django.forms.models import model_to_dict
 
 
 
@@ -22,7 +23,7 @@ class ChatConsumer(WebsocketConsumer):
         self.join_room_group()
         self.handell_activeChat_in_link("activeChat")
         self.accept()
-        print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+        # print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
     
     def handell_activeChat_in_link(self , activeChat):
         query_string = self.scope['query_string'].decode()
@@ -30,7 +31,7 @@ class ChatConsumer(WebsocketConsumer):
         activeChat = params.get(activeChat, [None])[0]
         if activeChat :
             self.update_user_chat_room_status(activeChat)
-            self.update_msg_room_status(activeChat)
+            # self.update_msg_room_status(activeChat)
             
 
     
@@ -267,57 +268,52 @@ class ChatConsumer(WebsocketConsumer):
                 message_in_user = message_in_user.replace(word, '*' * len(word))
         return message_in_user
         
-    # def save_chat(self, message, image, room_obj , other_users):
-    #     try:
-    #         chat = None
-    #         new_other_users = NewUser.objects.get(id=other_users)
-    #         print("user_obj_iduser_obj_id",other_users)
-    #         if message and not image:
-    #             chat = Chat.objects.create(room_id=room_obj, message=message , user_to=new_other_users)
-    #             chat.user_id.set([self.user_id])
-    #         elif image:
-    #             chat = Chat.objects.filter(id=image).first()
-    #         return chat
-    #     except Exception as e:
-    #         print(f"An error occurred: {e}")
-    #         return None
-    # def save_chat(self, message, image, room_obj , other_users):
-    #     try:
-    #         chat = None
-    #         new_other_users = NewUser.objects.get(id=other_users)
-    #         if (new_other_users.is_activeChat == room_obj.id):
-    #             get_is_read = True
-    #         else:
-    #             get_is_read = False
-    #         print("user_obj_iduser_obj_id",other_users , room_obj.id)
-    #         if message and not image:
-    #             chat = Chat.objects.create(room_id=room_obj, message=message, user_to=new_other_users.id, user_id=self.user_id, is_read=get_is_read)
-    #         elif image:
-    #             chat = Chat.objects.filter(id=image).first()
-    #         return chat
-    #     except Exception as e:
-    #         print(f"An error occurred: {e}")
-    #         return None
-    def save_chat(self, message, image, room_obj , other_users):
+
+
+    
+    def save_chat(self, message, image, room_obj, other_users, vote_data):
         try:
-            new_other_users = NewUser.objects.get(id=other_users)
-            if int(new_other_users.is_activeChat) == int(room_obj.id):
-                is_read = True
-                # self.update_msg_room_status(int(new_other_users.is_activeChat))
-            else:
-                is_read = False
-            print("user_obj_id:", other_users, "room_obj_id:", room_obj.id , is_read)
-            if message and not image:
-                chat = Chat.objects.create(room_id=room_obj, message=message , is_read=is_read)
-                chat.user_id.set([self.user_id])
-                chat.user_to.set([new_other_users])
-                print(new_other_users.id , self.user_id)
+            if vote_data and vote_data.get('discussion_topic', ''):
+                discussion_topic = vote_data.get('discussion_topic', '')
+                description_discussion = vote_data.get('description_discussion', '')
+                voting_questions = vote_data.get('voting_questions', [])
+                if voting_questions:
+                    voting_questions_data = []
+                    for question in voting_questions:
+                        question_text = next(iter(question.values()))
+                        VotingQuestion = Voting_Questions.objects.create(question=question_text)
+                        voting_questions_data.append(VotingQuestion)
+                        
+                        
+                    # Vote_data.voting_questions.set(voting_questions_data)
+                    
+                    Vote_data = vote.objects.create(discussion_topic=discussion_topic, 
+                                                    description_discussion=description_discussion,
+                                                    )
+                    Vote_data.user_id.set([self.user_id])
+                    Vote_data.voting_questions.set(voting_questions_data)
+                    print("VotingQuestion",voting_questions_data)
+
+                    
+                    chat = Chat.objects.create(room_id=room_obj, vote=Vote_data)
+                    if chat is not None:
+                        chat.user_id.set([self.user_id])
+                else:
+                    chat = Chat.objects.create(room_id=room_obj)
+                    if chat is not None:
+                        chat.user_id.set([self.user_id])
+            elif message and message.strip() and not image:
+                chat = Chat.objects.create(room_id=room_obj, message=message)
+                if chat is not None:
+                    chat.user_id.set([self.user_id])
             elif image:
                 chat = Chat.objects.filter(id=image).first()
-                if chat :
-                    print("image" , chat , new_other_users)
+                if chat:
+                    print("image", chat)
                 else:
-                    print("image" ,"else")
+                    print("image", "else")
+            else:
+                chat = None
             return chat
         except NewUser.DoesNotExist:
             print(f"User with id {other_users} does not exist.")
@@ -325,7 +321,7 @@ class ChatConsumer(WebsocketConsumer):
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
-    
+        
         
         
     def save_notification(self, user_id, message, chat):
@@ -341,11 +337,7 @@ class ChatConsumer(WebsocketConsumer):
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
-        
-    
-        
-
-                
+              
     def handle_send_msg_or_navgaction(self, room_users, message, chat, user_obj):
         try:
             for user_id in room_users:
@@ -392,8 +384,6 @@ class ChatConsumer(WebsocketConsumer):
                 print(f"Failed to send notification, {e}")    
         else:
             print("No notification sent")
-
-
     # تحديد قائمة لتخزين حالات الإشعارات المرسلة
     sent_notifications = []
 
@@ -441,51 +431,158 @@ class ChatConsumer(WebsocketConsumer):
     
 
     
+  
+    def ADD_USER_TO_QUESTION(self, room_id , msg_id, room ,  questions_id , UserFulterArry_id):
+        print("questions_id",questions_id)
+        print("UserFulterArry_id",UserFulterArry_id)
+        room_obj = self.get_data_in_this_room(room)
+        user_obj = self.get_data_user_join_naw(self.user_id) 
+        room_users = self.get_users_in_room(room_obj)
+        
+        voting_question = Voting_Questions.objects.get(id=questions_id)
+        if voting_question.list_of_people_who_vote.filter(id=UserFulterArry_id).exists():
+            voting_question.list_of_people_who_vote.remove(UserFulterArry_id)
+        else:
+            voting_question.list_of_people_who_vote.add(UserFulterArry_id)
+        voting_question.save()
+        chat = Chat.objects.get(id=msg_id)
+        response_data = {
+            'type': 'edite.message',
+            'voting_question': voting_question.id,
+            'msg_id':msg_id,
+            'room_id':room_id
+        }
+        # if chat:
+        #     response_data['id'] = chat.id
+        
+        # if chat and hasattr(chat, 'vote'):
+        #     vote_dict = model_to_dict(chat.vote) if chat.vote else {}
+        #     vote_dict['files'] = str(vote_dict['files']) if vote_dict.get('files') else ''
+        #     vote_dict['image'] = str(vote_dict['image']) if vote_dict.get('image') else ''
+        #     voting_questions = vote_dict.get('voting_questions', [])
+        #     print("voting_questions",voting_questions)
+
+        #     vote_dict['voting_questions'] = [model_to_dict(question) for question in voting_questions]
+            
+        #     vote_dict['user_id'] = [model_to_dict(user) for user in vote_dict['user_id']] if vote_dict.get('user_id') else []
+            
+        #     for user in vote_dict['user_id']:
+        #         user['image'] = str(user['image']) if user.get('image') else ''
+        #     response_data['vote'] = vote_dict
+        # else:
+        #     response_data['vote'] = {}
+            
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            response_data
+        )
+    
+    def edite_message(self, event):
+        print("event",event)
+        voting_question_id = event['voting_question']
+        voting_question = Voting_Questions.objects.get(id=voting_question_id)
+        self.send(text_data=json.dumps({
+            'type': "edite_message_List_popel",
+            'room_id':event['room_id'],
+            'msg_id':event['msg_id'],
+            'voting_question': {
+                'id': voting_question.id,
+                'question_text': voting_question.question,
+                'list_of_people_who_vote': list(voting_question.list_of_people_who_vote.values_list('id', flat=True))
+            }
+        }, cls=DjangoJSONEncoder))
+        
     def receive(self, text_data):
-        print(text_data)
+        print("text_data",text_data)
         try:
-            text_data_json = json.loads(text_data)
+          text_data_json = json.loads(text_data)
+          get_type=text_data_json.get('type' , '')
+          room = text_data_json.get('room', '')
+          
+          if get_type == 'Eidet_questions':
+                questions_id=text_data_json.get('questions_id' , '')
+                UserFulterArry_id=text_data_json.get('UserFulterArry_id' , '')
+                room_id=text_data_json.get('room_id' , '')
+                msg_id=text_data_json.get('msg_id' , '')
+                count = self.ADD_USER_TO_QUESTION(room_id , msg_id , room , questions_id , UserFulterArry_id )
+          if get_type == 'chat_message':
+            print("chat_message", get_type)
+
+                
             message_in_user = text_data_json.get('message', '')
-            room = text_data_json.get('room', '')
+            # room_slug = text_data_json.get('room', '')
             image = text_data_json.get('image', None)
             room_obj = self.get_data_in_this_room(room)
             room_users = self.get_users_in_room(room_obj)
             other_users = self.get_other_users_in_room_only_first(room_obj)
             user_obj = self.get_data_user_join_naw(self.user_id)   # print(user_obj['user_name'])
+            vote = text_data_json['vote']
+
+            # print("vote" ,vote)
             message = self.handell_message(message_in_user)
-            chat = self.save_chat(message ,image , room_obj , other_users)
-            online_or_offline = self.handle_send_msg_or_navgaction(room_users , message , chat , user_obj)
+            
+            chat = self.save_chat(message ,image , room_obj , other_users , vote)
+            # online_or_offline = self.handle_send_msg_or_navgaction(room_users , message , chat , user_obj)
+            online_or_offline = True
             # filter_users = self.filter_users(room_obj , text_data_json)
             # print("room_usersroom_users" , room_users , "filter_users" , filter_users)
             # message_qs = Chat.objects.filter(room_id=room_obj, is_read=False)        
             # message_qs.update(is_read=True)
+               
+            # print("chat",chat)
             if online_or_offline:
+                response_data = {
+                    'type': 'chat.message',
+                    'state':'chat_message',
+                    'message': chat.message if hasattr(chat, 'message') else '',
+                    'room_id': room_obj.id if hasattr(room_obj, 'id') else '',
+                    # 'room_slug': room_obj.slug if hasattr(room_obj, 'slug') else '',
+                    'created_at': chat.created_at if chat and chat.created_at else '',
+                    'user_id': self.user_id,
+                    'user_name': user_obj['user_name'],
+                    'user_image': user_obj['image'] if user_obj['image'] else None,
+                    'image': chat.image.url if chat and chat.image else None,
+                    'room_users':room_users, # add this line to include the room users in the response
+                    'is_read':chat.is_read if chat and hasattr(chat, 'is_read') else '',
+                    # 'vote':chat.vote if chat and hasattr(chat, 'vote') else [],
+                }
+                if chat:
+                    response_data['id'] = chat.id
+            
+                    if chat and hasattr(chat, 'vote'):
+                        vote_dict = model_to_dict(chat.vote) if chat.vote else {}
+                        vote_dict['files'] = str(vote_dict['files']) if vote_dict.get('files') else ''
+                        vote_dict['image'] = str(vote_dict['image']) if vote_dict.get('image') else ''
+                        voting_questions = vote_dict.get('voting_questions', [])
+                        print("voting_questions",voting_questions)
+                        
+                        # voting_questions_data = []
+                        # for question in voting_questions:
+                        #     for key, value in question.items():
+                        #         voting_questions_data.append(Voting_Questions.objects.create(vote=chat.vote, question=value))
+                        vote_dict['voting_questions'] = [model_to_dict(question) for question in voting_questions]
+                       
+                        vote_dict['user_id'] = [model_to_dict(user) for user in vote_dict['user_id']] if vote_dict.get('user_id') else []
+                       
+                        for user in vote_dict['user_id']:
+                            user['image'] = str(user['image']) if user.get('image') else ''
+                        response_data['vote'] = vote_dict
+                    else:
+                        response_data['vote'] = {}
+                                
                 async_to_sync(self.channel_layer.group_send)(
                     self.room_group_name,
-                    {
-                        'type': 'chat.message',
-                        'state':'message',
-                        'id': chat.id,
-                        'message': chat.message if hasattr(chat, 'message') else '',
-                        'room_id': chat.room_id.id if hasattr(chat, 'room_id') else '',
-                        'created_at': chat.created_at if chat.created_at else '',
-                        'user_id': self.user_id,
-                        'user_name': user_obj['user_name'],
-                        'user_image': user_obj['image'] if user_obj['image'] else None,
-                        'image': chat.image.url if chat.image else None,
-                        'room_users':room_users, # add this line to include the room users in the response
-                        'is_read':chat.is_read if hasattr(chat, 'is_read') else '',
-                    }
+                    response_data
                 )            
-    
         except (ValueError, NewUser.DoesNotExist, Room.DoesNotExist) as e:
             print(f"An error occurred: {e}")
             self.send(text_data=json.dumps({'error': str(e)}))
             return
     
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred in receive2: {e}")
             self.send(text_data=json.dumps({'error': "Something went wrong"}))
+    
     
     
     def chat_message(self, event):
@@ -497,32 +594,36 @@ class ChatConsumer(WebsocketConsumer):
                 raise ValueError("'user_id' key is not present in event")
                         
             self.Send_message_to_WebSocket(event)
+            # print(f"lllllllllllllllllllllllll" ,event )
 
     
         except KeyError as e:
             # Handle the KeyError exception
-            print(f"KeyError occurred: {e}")
+            print(f"KeyError occurred in chat_message: {e}")
             self.send(text_data=json.dumps({'error': 'Required key missing in the event data.'}))
         except Chat.DoesNotExist as e:
             # Handle the DoesNotExist exception
-            print(f"Chat.DoesNotExist occurred: {e}")
+            print(f"Chat.DoesNotExist occurred in chat_message: {e}")
             self.send(text_data=json.dumps({'error': 'Chat message does not exist.'}))
         except Exception as e:
             # Handle any other exception
-            print(f"An error occurred: {e}")
+            print(f"An error occurred in chat_message: {e}")
             self.send(text_data=json.dumps({'error': str(e)}))
     
     def Send_message_to_WebSocket(self , event):
-        # print("send_message",event)
-        # Send message to WebSocket     
+            # print("send_message",event)
+            # Send message to WebSocket     
 
             image_url = event.get('image', None)
             if image_url:
                 image_url = settings.SITE_URL + image_url
-            print('is_readis_readis_read',event['is_read'])
+            # vote = JSON.parse(event.vote);
+            # print('is_readis_readis_read',event['is_read'])
             # Send message to WebSocket
+            #'state':'edi
+                
             self.send(text_data=json.dumps({
-                'type': "chat_message",
+                'type': event['state'],
                 'id': event['id'],
                 'message': event['message'],
                 'room_id': event['room_id'],
@@ -533,6 +634,7 @@ class ChatConsumer(WebsocketConsumer):
                 'room_users': event['room_users'],
                 'image': image_url,
                 'is_read':event['is_read'],
+                'vote':event['vote']
             }, cls=DjangoJSONEncoder))
 
 
@@ -549,7 +651,7 @@ class ChatConsumer(WebsocketConsumer):
                 
         except Exception as e:
             # Handle any exceptions that might occur
-            print(f"Error updating user status: {str(e)}")
+            print(f"Error updating user status in update_user_chat_room_status: {str(e)}")
            
 
 

@@ -5,6 +5,8 @@ from .models import *
 admin.site.register(Room)
 admin.site.register(Chat)
 admin.site.register(Notification)
-    
+admin.site.register(vote)
+admin.site.register(Voting_Questions)
+
 
 

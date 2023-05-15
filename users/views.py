@@ -12,14 +12,7 @@ from .models import *
 import jwt , datetime
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
-
-
-
-
-
-
-
+from rest_framework import serializers
 
 
 
@@ -30,35 +23,25 @@ class usersLestView(viewsets.ModelViewSet):
 
 
 
-    # def get_object(self, queryset=None, **kwargs):
-    #     item = self.kwargs.get('pk')
-    #     return get_object_or_404(NewUser, slug=item)
-
-    # # Define Custom Queryset
-    # def get_queryset(self):
-    #     return NewUser.objects.all()
-
-
 class CustomUserCreate(APIView):
     permission_classes = [AllowAny]
 
-    def post(seFavorite_Modelslf, request, format='json'):
-        serializer = CustomUserSerializer(data=request.data)
-        if serializer.is_valid():
+    def post(self, request, format='json'):
+        try:
+            serializer = CustomUserSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
             user = serializer.save()
             if user:
                 json = serializer.data
                 return Response(json, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
+        except serializers.ValidationError as e:
+            error_list = []
+            for field, errors in e.detail.items():
+                for error in errors:
+                    error_list.append(f"{field}: {error}")
+            return Response({'errors': error_list}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 
@@ -93,7 +76,6 @@ class LoginView(APIView):
         
         return response
             
-# localStorage
 
 class userView(APIView):
     def post(self, request):
@@ -190,12 +172,6 @@ class LoginUserView(APIView):
         else:
             return Response({'error': 'Invalid credentials'})
 
-
-# class UserDataView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         return Response(FultDataUserSerializer(request.user).data)
 
 
 

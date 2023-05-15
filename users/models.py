@@ -58,38 +58,20 @@ class CustomAccountManager(BaseUserManager):
 def uplodeimgeuser(instance, filname):
     return '/%Y/%m/%d/'.join(['NewUser', str(instance.email + "image"), filname])
 
-def uplodeimgpassport(instance, filname):
-    return '/%Y/%m/%d/'.join(['NewUser', str(instance.email + "passport"), filname])
-
-def uplodeimgeAcademic(instance, filname):
-    return '/%Y/%m/%d/'.join(['NewUser', str(instance.email + "Academic"), filname])
-
 
 class NewUser(AbstractBaseUser, PermissionsMixin):
-    # options2 = (
-    #     ('first stage', 'First Stage'),
-    #     ('second stage','Second Stage'),
-    #     ('third stage', 'Third Stage'),
-    #     ('fourth stage','Fourth Stage'),
-    # )
     # options = (
-    #     ('male', 'Male'),
-    #     ('female', 'Female'),
-    #     ('others', 'Others')
+    #     ('club_manager', 'club_manager'),
+    #     ('club_coach', 'club_coach'),
+    #     ('regular_member', 'regular_member')
     # )
+    # role = models.CharField(max_length=20, blank=True, choices=options, default='regular_member')
     userId = ShortUUIDField()
     image = models.ImageField(upload_to=uplodeimgeuser ,default='default.png' , blank=True, null=True)
-    passport = models.ImageField(upload_to=uplodeimgpassport ,default='default.png' , blank=True, null=True)
-    Academic = models.ImageField(upload_to=uplodeimgeAcademic ,default='default.png' , blank=True, null=True)
-    country = models.CharField( max_length=20 , null=True, blank=True )
-    flag = models.CharField( max_length=20 , null=True, blank=True )
-    gender = models.CharField( max_length=20 , null=True, blank=True )
     email = models.EmailField(_('email address'), unique=True)
     user_name = models.CharField(max_length=150, unique=True , null=True)
     first_name = models.CharField(max_length=150, blank=True , null=True)
     LastName = models.CharField(max_length=120, null=True, blank=True)
-    university = models.CharField(max_length=120, null=True, blank=True)
-    sections   = models.CharField(max_length=120, null=True, blank=True)
     start_date = models.DateTimeField(default=timezone.now)
     about = models.TextField(_('about'), max_length=500, blank=True)
     is_online = models.BooleanField(default=False)
@@ -97,17 +79,13 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_Assistant = models.BooleanField(default=False)
-        # Nationality = models.CharField(max_length=80, null=True, blank=True)
     objects = CustomAccountManager()
     
-    
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['user_name', 'first_name']
 
     def __str__(self):
         return self.user_name
-
 
 @receiver(post_save, sender=NewUser)
 def create_user_room(sender, instance, created, **kwargs):

@@ -20,9 +20,6 @@ from django.urls import reverse_lazy
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'apuvicmef^(!j8gx&clu0u(!8m0r^etok^l0)kc!---#(i5=dt'
 
@@ -32,8 +29,6 @@ DEBUG = True
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ["*"]
 SITE_URL = 'http://localhost:8000'
-# MEDIA_URL = '/media/'
-# SITE_URL = reverse_lazy('home')
 
 
 # Application definition
@@ -41,8 +36,10 @@ SITE_URL = 'http://localhost:8000'
 INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'rest_framework.authtoken',
     'corsheaders',
     'channels',
+    'channels_redis',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,9 +47,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'users',
-    "university",
-    'chat',
-    'chat2',
     'chat3',
 ]
 
@@ -93,26 +87,6 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 
-ASGI_APPLICATION = "core.routing.application"
-
-
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    }
-}
-
-
-
-# Channels settings
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             'hosts': [('127.0.0.1', 6379)],
-#         },
-#     },
-# }
 
 
 DATABASES = {
@@ -164,100 +138,17 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# Permissions:
-# AllowAny
-# IsAuthenticated
-# IsAdminUser
-# IsAuthenticatedOrReadOnly
-# CORS_ALLOW_CREDENTIALS = True
-# CORS_ORIGIN_ALLOW_ALL = False
-# CORS_ORIGIN_WHITELIST = [
-#     "http://localhost:3000",
-#     'http://localhost:5173',
-#     'http://localhost:5174'
-# ]
+
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'https://35ef-82-193-155-247.eu.ngrok.io',
 ]
 
-
-
-# CORS_ORIGIN_WHITELIST = [
-#     'http://localhost:3000',
-#     # "https://6765-5-2-55-73.eu.ngrok.io/",
-
-# ]
 # Custom user model
 AUTH_USER_MODEL = "users.NewUser"
 
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
-#     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
-#     'ROTATE_REFRESH_TOKENS': True,
-#     'BLACKLIST_AFTER_ROTATION': True,
-#     'ALGORITHM': 'HS256',
-#     'SIGNING_KEY': SECRET_KEY,
-#     'VERIFYING_KEY': None,
-#     'AUTH_HEADER_TYPES': ('JWT',),
-#     'USER_ID_FIELD': 'id',
-#     'USER_ID_CLAIM': 'user_id',
-#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-#     'TOKEN_TYPE_CLAIM': 'token_type',
-# }
 
-# SIMPLE_JWT = {
-#     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=90),
-#     'REFRESH_TOKEN_LIFETIME': timedelta(days=90),
-#     'ROTATE_REFRESH_TOKENS': True,
-#     'BLACKLIST_AFTER_ROTATION': True,
-#     'UPDATE_LAST_LOGIN': False,
-
-#     'ALGORITHM': 'HS256',
-#     'SIGNING_KEY': SECRET_KEY,
-#     'VERIFYING_KEY': None,
-#     'AUDIENCE': None,
-#     'ISSUER': None,
-#     'JWK_URL': None,
-#     'LEEWAY': 0,
-
-#     'AUTH_HEADER_TYPES': ('Bearer',),
-#     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-#     'USER_ID_FIELD': 'id',
-#     'USER_ID_CLAIM': 'user_id',
-#     'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
-
-#     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-#     'TOKEN_TYPE_CLAIM': 'token_type',
-#     'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
-
-#     'JTI_CLAIM': 'jti',
-
-#     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-#     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-#     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
-# }
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.AllowAny',
-#     ],
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework_simplejwt.authentication.JWTAuthentication'
-#     ],
-# }
-
-
-
-
-
-
-
-
-# settings.py
 
 from datetime import timedelta
 
@@ -293,17 +184,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-# REST_FRAMEWORK = {
-#     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.AllowAny',
-#     ],
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework_simplejwt.authentication.JWTAuthentication',
-#         'rest_framework.authentication.SessionAuthentication',
-#         'rest_framework.authentication.BasicAuthentication',
-#     ],
-# }
+
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
@@ -337,3 +218,16 @@ DEFAULT_AUTO_FIELD ='django.db.models.BigAutoField'
 
 
 
+# sit channels:
+WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
+
+
+ASGI_APPLICATION = "core.routing.application"
+
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}

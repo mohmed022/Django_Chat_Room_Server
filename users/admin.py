@@ -9,13 +9,13 @@ from django.db import models
 class UserAdminConfig(UserAdmin):
     model = NewUser
     search_fields = ('id','email', 'user_name', 'first_name',)
-    list_filter = ('id','email', 'user_name', 'first_name', 'is_active', 'is_staff' , "is_Assistant" , "is_online" , "is_activeChat" ,"university","sections")
+    list_filter = ('id','email', 'user_name', 'first_name', 'is_active', 'is_staff' , "is_Assistant" , "is_online" , "is_activeChat" )
     ordering = ('-start_date',)
     list_display = ('id','email', 'user_name', 'first_name',
-                    'is_active', 'is_staff','is_Assistant' , "is_online" , "is_activeChat" ,"university","sections")
+                    'is_active', 'is_staff','is_Assistant' , "is_online" , "is_activeChat")
     fieldsets = (
         (None, {'fields': ('email', 'user_name', 'first_name',)}),
-        ('Permissions', {'fields': ('is_staff', 'is_active' , 'is_Assistant' , "is_online" , "is_activeChat" ,"university","sections")}),
+        ('Permissions', {'fields': ('is_staff', 'is_active' , 'is_Assistant' , "is_online" , "is_activeChat")}),
         ('Personal', {'fields': ('about',)}),
     )
     formfield_overrides = {
@@ -24,7 +24,7 @@ class UserAdminConfig(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'user_name', 'first_name', 'password1', 'password2', 'is_active', 'is_staff','is_Assistant' , "is_online" , "is_activeChat"  ,"university","sections")}
+            'fields': ('email', 'user_name', 'first_name', 'password1', 'password2', 'is_active', 'is_staff','is_Assistant' , "is_online" , "is_activeChat" )}
          ),
     )
 

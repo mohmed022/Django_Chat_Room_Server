@@ -3,6 +3,11 @@ python3 manage.py migrate
 python3 manage.py createsuperuser 
 python3 manage.py runserver 7000
 python3 manage.py runserver 
+
+
+pip freeze > requirements.txt
+pip install -r requirements.txt
+
 admin@admin.com
 cd client && npm run dev
 cd server && source env/bin/activate && python3 manage.py runserver
@@ -13,7 +18,7 @@ pip install channels_redis
 
 sudo apt install python3-virtualenv
 Python -m venv ./env
-deactivate
+deactivatec
 win:
 .\venv\Scripts\activate
 
@@ -32,21 +37,41 @@ python3 manage.py startapp
 python3 manage.py createsuperuser 
 
 
+lkklkl
 
-
- git remote add AMA_s https://github.com/mohmed022/AMAssistunt_server.git
+ git remote add AM https://github.com/mohmed022/AMAssistunt_server.git
  git remote add AM_A_C https://github.com/mohmed022/AMAssistunt_client.git
+ git remote add AM https://github.com/mohmed022/AM.git
+
 
  git init
  git add .
  git commit -m "Initial commit"
- git push AMA_s main --force
- git push AMA_s main
+ git push AM main --force
+ git push AM main
+git push AM master
+
+git branch -M main
 
 
 
 
 
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/mohmed022/A-M.git
+git push -u origin main
+
+
+
+
+
+
+
+pythonAnnyay :
+ssh-keygen
 
 admin122
 admin@admin.com

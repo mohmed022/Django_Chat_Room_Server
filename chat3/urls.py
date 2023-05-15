@@ -4,7 +4,7 @@
 
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import RoomView , ChatList , RoomFulterSerializer , ChatView ,NotificationViewSet
+from .views import RoomView , ChatList , RoomFulterSerializer , ChatView ,NotificationViewSet , RoomViewSet
 
 app_name = 'chat3'
 
@@ -20,6 +20,7 @@ urlpatterns = [
 
 
 ]
+router.register('rooms', RoomViewSet , basename='RoomsView')
 router.register('chat', ChatView, basename='ChatView')
 router.register('room', RoomView, basename='RoomView')
 router.register('RoomView', RoomFulterSerializer, basename='RoomView')
