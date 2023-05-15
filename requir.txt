@@ -57,5 +57,11 @@ pip install zope.interface==6.0
 
 
 
+git init 
+git add . 
+git commit -m 'Add account components'
 
-git remote add origin git@github.com:mohmed022/Django_Chat_Room_Server.git
+git stutes
+git remote add DjangoChatRoomServer git@github.com:mohmed022/Django_Chat_Room_Server.git
+git commit -m 'Add account components'
+git push -u Django_Chat_Room_Server main
